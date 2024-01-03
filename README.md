@@ -1,40 +1,105 @@
 # sdet-automation-test
-## What is Expected?
-This is a code challenge to test your skills related to the development of automated tests. We use pytest with python, 
-and allure for the reports, but feel free to use any framework you are familiar with, as long as you develop it using 
-Python. 
+This test automation was implemented using the SeleniumBase.
+SeleniumBase is a framework that is built with `python`, `pytest`, and `webdriver`.
 
-The test consists in some steps to interact with a web page and assert some conditions, generating a report with the test result after the execution.
+## SETUP
+In order to setup this application, <code>python</code> has to be installed on the local machine. After python has been installed, it comes with an inbuilt package manager called <code>pip</code>.
 
-## Test Scenario - Front End test
-For this test you should follow the steps:
-1. Go to https://www.amazon.com and expand the 'All' hamburger menu
+You can also setup your virtual environment just like mine so that you can have an isolated space for your setups, installations, scripts and libraries.
 
-![](./imgs/img_1.jpg)
-2. Under 'Shop By Department' open 'Arts & Craft'
+Using pip, install the following tools and packages by running the following commands in the terminal:
+1. Install selenium base: <code>pip3 install seleniumbase</code> (to verify after installation, enter `seleniumbase` into the terminal)
+2. Install chromedriver: <code>sbase install chromedriver latest</code> (you can also install other driver based on your preference. However, for this test, i will be using chromedriver).
 
-![](./imgs/img_2.jpg)
-3. Open 'Beading & Jewelry Making'
 
-![](./imgs/img_3.jpg)
-4. Open 'Engraving Machines & Tools'
+## HOW TO RUN
 
-![](./imgs/img_4.jpg)
-5. Sort by Price: High to Low
+#### If you want to run all test, navigate to the project root via the terminal, and type: 
+```sh
+pytest 
+```
+#### or if you want to run a specific test
+```sh
+pytest -k (test_name) -s
+```
 
-![](./imgs/img_5.jpg)
-6. For the products that are currently available, open the third one.
-7. Check the review score. If it's less than 4, fail the test, otherwise pass it.
-8. Check the price for the opened item. If it's more than $4000, fail the test, otherwise pass it.
-9. Generate a report with the test result. In case of failure, attach a screenshot of the current page in the report.
+#### If you want to run tests with logs displaying, you should type: 
+```sh
+pytest -s 
+```
 
-## Repository
-You will need to fork the repository and build the solution in Github publicly. Once you are finished, share your
-repository with us. We expect this to be finished in one week, but if anything happens and this deadline cannot be met, 
-reach out, so we know what is happening instead of think that you are not interested in this position anymore. 
+#### If you want to run test in headless mode, you should type: 
+```sh
+pytest -s --headless 
+```
 
-## Deliverables:
-* Code in a public Github repository
-* README file with the notes, documentation, and instructions related to the code developed
-* The test execution should do the above steps and generate a report with the tests results. In case of a test failure, it should also attach a screenshot of the current page when the test failed.
-* Have the test parametrized so we can choose if we want to run it in headless mode or not.
+#### If you want to run tests with a specific browser, you should type: 
+```sh
+pytest -s --browser=firefox 
+```
+
+#### If you want to run tests with a dashboard report, you should type: 
+```sh
+pytest -s --dashboard 
+```
+
+#### If you want to run tests with a html report, you should type: 
+```sh
+pytest -s --html=report.html 
+```
+
+## Implementation:
+This automation framework follows `Page Object Model` pattern.
+
+The main class `test_purchase_engraving.py` inside the tests package is where we call the test and test cases. 
+The pages package contains the classes for the various pages, each of these class object inherits `BaseCase`, and contains the elements and methods for various actions. 
+These page objects `StartBrowser`, `HomePage`, `SideMenu`, `EngravingPage` were then injected into the `PurchaseEngravingTest()` class, giving it access to all the test cases and elements.
+
+```python
+class PurchaseEngravingTest(StartBrowser,HomePage,SideMenu,EngravingPage):
+
+    def setUp(self):
+        super().setUp()
+        StartBrowser.setUp(self)
+        HomePage.setUp(self)
+        SideMenu.setUp(self)
+        EngravingPage.setUp(self)
+
+        print("PurchaseEngravingTest *STARTS*")
+        self.launch_browser()
+        self.verify_page_title()
+        self.verify_logo_is_present()
+```
+
+```python
+    def test_purchaseEngraving(self):
+        self.click_dropdownMenuOption()
+        self.click_artsAndCraftOption()
+        self.click_beadingAndJewelryOption()
+        self.click_artsAndCraftAndSewingOption()
+        self.click_beadingAndJewelryMakingOption()
+        self.click_engravingMachinesAndToolsOption()
+        self.click_sortByDropdown()
+        self.select_sortByHighToLowOption()
+        self.click_resultThirdOption()
+        self.validate_ratingIsAboveFour()
+        self.validate_priceValue()
+```
+
+## Reports and Dashboard
+* SeleniumBase automatically generates the reports after the first run with <code>dashboard</code> or <code>html</code> command. Instructions for this, is in the How To Run section.
+* To view the reports after a test run, you can select one of the two options <code>dashboard.html</code> and <code>report.html</code> found in the root folder by default
+* After the test run is completed using the reporting command, a file url is generated and displayed either at the beginning or at the end of the test run inside the terminal. This url opens the report in the browser.
+
+`dashboard_report`
+![imgs/dashboard_report.png](imgs/dashboard_report.png)
+`html_report`
+![imgs/html_report.png](imgs/html_report.png)
+
+## Screenshots
+* SeleniumBase also automatically generates a screenshot for you after a fail test.
+* The screenshot <code>screenshot.png</code> can be found inside the folder: `latest_logs` and `assets`.
+* Also included is the webpage screenshot <code>page_source.html</code>, displaying the page where your test failed.
+* `N/B` The `latest_logs` folder alongside the screenshot is created after a failed test run
+
+![imgs/screenshot.png](imgs/screenshot.png)
